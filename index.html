@@ -1,0 +1,154 @@
+<canvas id="canvas" width="700" height="997" style="float:left"></canvas>
+<div id="translated" width="300" height="500" style="width:200px;height:50px;float:left"></div>
+<script>
+var img = new Image();
+img.src = "https://i.imgur.com/jTKLGWV.png";
+img.crossOrigin = "anonymous";
+
+var canvas = document.getElementById("canvas");
+var translated = document.getElementById("translated");
+var context = canvas.getContext("2d");
+
+img.onload = function() {
+  context.drawImage(img, 0, 0);
+  img.style.display = "none";
+  translate();
+};
+
+var morseCode = {
+      '.-': 'a',
+      '-...': 'b',
+      '-.-.': 'c',
+      '-..': 'd',
+      '.': 'e',
+      '..-.': 'f',
+      '--.': 'g',
+      '....': 'h',
+      '..': 'i',
+      '.---': 'j',
+      '-.-': 'k',
+      '.-..': 'l',
+      '--': 'm',
+      '-.': 'n',
+      '---': 'o',
+      '.--.': 'p',
+      '--.-': 'q',
+      '.-.': 'r',
+      '...': 's',
+      '-': 't',
+      '..-': 'u',
+      '...-': 'v',
+      '.--': 'w',
+      '-..-': 'x',
+      '-.--': 'y',
+      '--..': 'z',
+      '-----': '0',
+      '.----': '1',
+      '..---': '2',
+      '...--': '3',
+      '....-': '4',
+      '.....': '5',
+      '-....': '6',
+      '--...': '7',
+      '---..': '8',
+      '----.': '9',
+      '.--.-': 'à',
+      '.--.-': 'å',
+      '.-.-': 'ä',
+      '----': 'ch',
+      '.-..-': 'è',
+      '..-..': 'é',
+      '---.': 'ö',
+      '..--': 'ü',
+      '...--..': 'ß',
+      '--.--': 'ñ',
+      '.-.-.-': '.',
+      '--..--': ',',
+      '---...': ':',
+      '-.-.-.': ';',
+      '..--..': '?',
+      '-....-': '-',
+      '..--.-': '_',
+      '-.--.': '(',
+      '-.--.-': ')',
+      '.----.': '\'',
+      '-...-': '=',
+      '.-.-.': '+',
+      '-..-.': '/',
+      '.--.-.': '@'
+};
+
+function morseCodeToText(morse) {
+	var output = '';
+
+	var newLineRegExp = new RegExp('\n', 'g');
+	morse = morse.replace(newLineRegExp, ' \n ');
+	morse = morse.replace(new RegExp(String.fromCharCode(8212), 'g'), '--');
+
+	var words = morse.split(' / ');
+	for (var i = 0; i < words.length; i++) {
+		if (i !== 0) output += ' '; // word separator
+
+		if (words[i].length === 0) continue;
+		var chars = words[i].split(' ');
+		for (var j = 0; j < chars.length; j++) {
+			var tmp = morseCode[chars[j]];
+
+			// check if a morse code translation exists
+			if (typeof tmp === 'undefined') {
+				tmp = chars[j];
+			}
+
+			output += tmp;
+		}
+	}
+
+	return output;
+}
+
+function crop() {
+    canvas.width = 591;
+    canvas.height = 892;
+    context.drawImage(img, 54, 53, 591, 892, 0, 0, 591, 892);
+  }
+
+function getSpaceCharacter(data, i) {
+  if ((data[i+4] != 0 && data[i+8] != 0 && data[i+12] != 0 && data[i+16] != 0 && data[i+20] != 0) || (data[i-4] != 0 && data[i-8] != 0 && data[i-12] != 0 && data[i-16] != 0 && data[i-20] != 0)) {
+    return '9';
+  } else {
+    return '0';
+  }
+}
+
+function translate() {
+  var morseString = '';
+  crop();
+
+  var pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+  var all = pixels.data.length;
+  var data = pixels.data;
+  var rawString = '';
+  for (var i = 0; i < all;i += 4) {
+    if (data[i] === 0) {
+      if (data[i+4] === 0 || data[i-4] === 0) {
+        rawString += '2';
+      } else {
+        rawString += '1';
+      }
+    } else {
+      var character = getSpaceCharacter(data, i);
+      rawString += character;
+    }
+  }
+
+  var dotsString = rawString.replace(/1/g, ".");
+  var dashString = dotsString.replace(/2{1,}/g, "-");
+  var spaceString = dashString.replace(/0{1,}/g, "");
+  var wordSpaceString = spaceString.replace(/9{1,}/g, " / ");
+  console.log('Word ' + wordSpaceString);
+  morseString = wordSpaceString;
+  var translatedString = morseCodeToText(morseString);
+  translated.textContent = translatedString;
+}
+
+</script>
