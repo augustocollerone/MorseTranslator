@@ -112,6 +112,21 @@ function crop() {
     context.drawImage(img, 54, 53, 591, 892, 0, 0, 591, 892);
   }
 
+function isBlankIn(data, i, Qty) {
+  var blanks = 0;
+  for (var p = 1; p < Qty;p += 1) {
+    if ((data[i+(4*Qty)] != 0) || (data[i-(4*Qty)] != 0)) {
+      blanks += 1;
+    }
+  }
+
+  if (blanks === Qty) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 function getSpaceCharacter(data, i) {
   if ((data[i+4] != 0 && data[i+8] != 0 && data[i+12] != 0 && data[i+16] != 0 && data[i+20] != 0) || (data[i-4] != 0 && data[i-8] != 0 && data[i-12] != 0 && data[i-16] != 0 && data[i-20] != 0)) {
     return '9';
