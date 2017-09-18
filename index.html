@@ -112,6 +112,14 @@ function crop() {
     context.drawImage(img, 54, 53, 591, 892, 0, 0, 591, 892);
   }
 
+function hexToString(hexString) {
+  var hex = hexString.replace(/\s/g,'')
+  var string = '';
+  for (var l = 0; l < hex.length; l += 2)
+    string += String.fromCharCode(parseInt(hex.substr(l, 2), 16));
+  return string;
+}
+
 function isBlankIn(data, i, Qty) {
   var blanks = 0;
   for (var p = 1; p < Qty;p += 1) {
@@ -163,7 +171,7 @@ function translate() {
   console.log('Word ' + wordSpaceString);
   morseString = wordSpaceString;
   var translatedString = morseCodeToText(morseString);
-  translated.textContent = translatedString;
+  translated.textContent = ("Parte Binario: " + translatedString + "\n \n \n Parte HEX: " + hexToString(translatedString));
 }
 
 </script>
